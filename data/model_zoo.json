@@ -1363,5 +1363,48 @@
                   "mean_fold_time": 93.81,
                   "std_fold_time": 1.59
             }
+      },
+      "fold": {
+            "risky_two_class_2-dbmdz-bert-base-turkish-128k-uncased": {
+                  "0": {
+                        "precision": 0.4646017699115044,
+                        "recall": 1.0,
+                        "f1-score": 0.6344410876132931,
+                        "support": 105
+                  },
+                  "1": {
+                        "precision": 0.0,
+                        "recall": 0.0,
+                        "f1-score": 0.0,
+                        "support": 121
+                  },
+                  "accuracy": 0.8863364591856001,
+                  "macro avg": {
+                        "precision": 0.8866840121247994,
+                        "recall": 0.8863355160129719,
+                        "f1-score": 0.8863107361554845,
+                        "support": 15889
+                  },
+                  "weighted avg": {
+                        "precision": 0.8866832835022853,
+                        "recall": 0.8863364591856001,
+                        "f1-score": 0.8863108437832256,
+                        "support": 15889
+                  },
+                  "mean_fold_time": 1006.26,
+                  "std_fold_time": 3.63,
+                  "first hand": {
+                        "precision": 0.8982610952504542,
+                        "recall": 0.87134944612286,
+                        "f1-score": 0.8846006389776356,
+                        "support": 7944
+                  },
+                  "second hand": {
+                        "precision": 0.8751069289991446,
+                        "recall": 0.9013215859030838,
+                        "f1-score": 0.8880208333333333,
+                        "support": 7945
+                  }
+            }
       }
 }

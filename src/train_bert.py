@@ -3,10 +3,15 @@
 
 import argparse
 from utils.preprocess_utils import preprocess_text
-from utils.pipeline_utils import add_external_positive_data, run_cv
+from utils.pipeline_utils import run_cv
 from utils.data_utils import read_training_data
 from models.bert_model import BertModel
-
+from sklearn.model_selection import train_test_split
+import time
+from utils.constants import MODEL_CV_RESULT_PATH, TARGET_DICT, TARGET_INV_DICT
+from sklearn.metrics import classification_report
+from utils.preprocess_utils import special_token
+import pandas as pd
 
 def main(args):
     df = read_training_data()
@@ -17,7 +22,7 @@ def main(args):
     elif args.prevent_bias == 1:
         bias_naming = "-casing-unbiased"
 
-    experiment_name = f"toxic-{args.model_path.replace('/', '-')}{bias_naming}"
+    experiment_name = f"text_classification-{args.model_path.replace('/', '-')}{bias_naming}"
     model_params = {"model_path": args.model_path,
                     "epochs": args.epochs,
                     "batch_size": args.batch_size,
@@ -47,17 +52,40 @@ def main(args):
                prevent_bias=args.prevent_bias
                )
     else:
+        print()
+        print("*"*30)
+        print("Started Training")
+        print("*"*30)
+        print(f"Experiment: '{experiment_name}'")
+        print("*"*30)
+        print()
+        start_time = time.time()
+        df["target"] = df["target"].map(TARGET_DICT)
+
+        X = df[args.xcol]
+        y = df[args.ycol]
+
+        # Split the data into 90% train and 10% validation sets
+        X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.1, random_state=42)
         model = BertModel(**model_params)
-        X_train = df[args.xcol]
-        y_train = df[args.ycol]
-
-        if args.prevent_bias == 2:
-            X_train, y_train = add_external_positive_data(x_series=X_train, y_series=y_train)
-        X_train = preprocess_text(X_train, prevent_bias=args.prevent_bias)
-
         model.train(X_train,
                     y_train,
+                    X_val,
+                    y_val,
                     fold_id="none")
+        preds, pred_probas = model.predict(X_val)
+
+"""        df_val = pd.DataFrame({'text': X_val, 'target': y_val})
+        df_val["target"] = df_val["target"].map(TARGET_INV_DICT)
+        df_val['pred'] = [TARGET_INV_DICT[p] for p in preds]
+
+        print("\nTraining finished! Result:\n")
+        print(classification_report(df_val["target"],
+                                    df_val["pred"],
+                                    output_dict=False,
+                                    digits=4))"""
+
+
 
 
 if __name__ == "__main__":
@@ -80,7 +108,7 @@ if __name__ == "__main__":
     parser.add_argument('-mlm-probability', type=float, default=0.15)
 
     parser.add_argument('-out-folder', type=str, default="../checkpoint")
-    parser.add_argument('-fold-name', type=str, default="public_fold")
+    parser.add_argument('-fold-name', type=str, default="fold")
     parser.add_argument('-xcol', type=str, default="text")
     parser.add_argument('-ycol', type=str, default="target_label")
     parser.add_argument('--add-zoo', action='store_true')

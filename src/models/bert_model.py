@@ -16,7 +16,7 @@ from transformers import (AdamW, AutoModelForMaskedLM,
                           TrainingArguments, get_cosine_schedule_with_warmup)
 
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:21"
-
+NUM_LABELS = 3
 
 def get_optimizer_grouped_parameters(model,
                                      learning_rate,
@@ -247,7 +247,7 @@ class BertModel(BaseModel):
         
         self.model = AutoModelForSequenceClassification.from_pretrained(self.model_path,
                                                                         use_auth_token=self.auth_token,
-                                                                        num_labels=5)
+                                                                        num_labels=NUM_LABELS)
         self.model.to(self.device)
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_path,
                                                        use_auth_token=self.auth_token,
@@ -353,7 +353,7 @@ class BertModel(BaseModel):
 
         # Model initialization
         self.model = AutoModelForSequenceClassification.from_pretrained(model_path,
-                                                                        num_labels=5,
+                                                                        num_labels=NUM_LABELS,
                                                                         ignore_mismatched_sizes=True)
         self.model.to(self.device)
         self.tokenizer = AutoTokenizer.from_pretrained(model_path,
@@ -504,7 +504,6 @@ class BertModel(BaseModel):
                 predictions = torch.argmax(logits, dim=1)
                 all_preds.extend(predictions.cpu().numpy())
                 all_probas.extend(probas.cpu().numpy())
-
         return all_preds, all_probas
 
     def evaluate(self,

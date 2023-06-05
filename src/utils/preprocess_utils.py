@@ -6,6 +6,22 @@ from zemberek import (TurkishMorphology, TurkishSentenceExtractor,
 
 remove_punc = str.maketrans('', '', string.punctuation)
 
+second_hand_terms = ["için satıyorum", "icin satiyorum", "hediye olarak geldi", "hediye geldi", "hediye alındı", "hediye alindi"
+'kullanılmadı', "kullanilmadi", "kullanmadım", "kullanmadim", "kullandık", "kullandik",
+"kullanılmamıştır", "kullanilmamistir", "kullandım", "kullandim," "giyilmedi", "giyildi", "giydim", "giydik", "giyilmiş", "giyilmis"
+"giyilmemiştir", "giyilmemistir", 'giymedim', 'giymediler', "giyemedim", "giyemedik",
+'çizik var', 'cizik var', 'çiziği var', 'cizigi var', 'yırtık var', "soluk var", "yırtık yoktur",
+"bedeni olmadı", "bana olmuyor", "bedeni uymuyor", "küçük geldi", 'kucuk geldi', "küçük oldu", 'kucuk oldu',
+"büyük geldi", "buyuk geldi", "büyük oldu", "buyuk oldu", "hatasızdır", "hatasizdir", "sorunsuzdur", "temizdir", "defosuzdur",
+"iyi durumda", "sorunu yok", "az kullanıldı", "az kullanildi" "sıfır gibi", "sifir gibi", "sıfır ayarında", "sifir ayarinda",
+"mağazasından alınmıştır", "magazasindan alinmistir"
+"oyuncudan alınmıştır", "oyuncudan alinmistir", "futbolcudan", "maç sonu", "dolayi satiyorum", "dolayı satıyorum", 
+"pazarlık", "indirim", "son fiyat"]
+
+risky_terms = ["tüm bedenler mevcuttur", "tum bedenler mevcuttur", "her bedeni mevcuttur",
+ "s m l", "s / m / l", "yeni & etiketli", "etiketli", "s-m-l-xl", "s m xl xxl", "beden seçenekleri", "bedenler",
+ "hızlı kargo", "replika", "smlxlxxl", "numaralar mevcuttur", "numaralar vardır", "seçenekleri vardır", "secenekleri vardir",
+ "ilan actiriniz", "ilan açtırınız", "ilanı satın almayın", "ilani satin almayin", "s,m,l", "41,42,43,44", "41 42 43 44"]
 
 SPIECE_UNDERLINE = u"▁".encode("utf-8")
 
@@ -65,8 +81,7 @@ class TextNormalization:
         return outputs
 
 
-# Lowercasing with special token
-def special_lowercase(x):
+def special_token(x):
     """
     Add special token if text contains upper chars.
     
@@ -74,14 +89,13 @@ def special_lowercase(x):
     param x: Text
     return: Adjusted text
     """
-    chars = []
-    for char in x:
-        if char.lower() != char:
-            chars.append("# ")
-            chars.append(char.lower())
-        else:
-            chars.append(char.lower())
-    return "".join(chars)
+    for term in second_hand_terms:
+        if term in x:
+            x = x.replace(term, f"^s^^ {term}")
+    for term in risky_terms:
+        if term in x:
+            x = x.replace(term, f"#r## {term}")
+    return x
 
 
 # Word Count Feature
@@ -94,12 +108,13 @@ def feature_wordcount(x):
     return: Adjusted text
     """
     length = len(x.split())
-    if length < 5:
-        return "+ " + x
-    elif 5 <= length < 10:
-        return "++ " + x
-    else:
+    if length > 1000:
         return "+++ " + x
+    elif length > 1500:
+        return "+++++ " + x
+    elif length > 2000:
+        return "++++++" + x
+    return x
 
 
 def preprocess_text(textcol,
@@ -123,11 +138,8 @@ def preprocess_text(textcol,
     if prevent_bias > 0:
         textcol = textcol.str.lower()
 
-    # Vanilla Flow
-    elif prevent_bias == 0:
-        textcol = textcol.apply(special_lowercase)
-
-    # textcol = textcol.apply(feature_wordcount)
+    textcol = textcol.apply(special_token)
+    textcol = textcol.apply(feature_wordcount)
 
     return textcol
 

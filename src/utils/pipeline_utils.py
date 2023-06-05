@@ -8,16 +8,16 @@ from .preprocess_utils import preprocess_text
 from .data_utils import read_model_zoo, update_zoo, write_model_zoo
 from .constants import MODEL_CV_RESULT_PATH, TARGET_DICT, TARGET_INV_DICT
 
-
+"""
 def add_external_positive_data(x_series, y_series):
-    """
+    
     Adds external non-offensive corpus to the fiven original data
 
     ---------
     :param x_series: Original text data
     :param y_series: Original labels
     :return: Concatenated original and extra corpus with respective labels
-    """
+    
     external_path = "../data/external/tweetset.csv"
     if not os.path.exists(external_path):
         os.system(
@@ -31,6 +31,7 @@ def add_external_positive_data(x_series, y_series):
     x_series = pd.concat([x_series, x_train_ext], ignore_index=True)
     y_series = pd.concat([y_series, y_train_ext], ignore_index=True)
     return x_series, y_series
+"""
 
 
 def run_cv(model_obj,
@@ -100,8 +101,7 @@ def run_cv(model_obj,
         input_df.loc[val_idx, TARGET_DICT.keys()] = pred_probas
 
         for pred_i, pred in enumerate(preds):
-            preds[pred_i] = TARGET_INV_DICT[pred] if pred in [0, 1, 2, 3, 4] else pred
-
+            preds[pred_i] = TARGET_INV_DICT[pred]
         input_df.loc[val_idx, "pred"] = preds
         end_time = time.time()
         elapsed_time = end_time - start_time

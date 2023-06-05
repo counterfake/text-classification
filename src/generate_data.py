@@ -15,4 +15,4 @@ df['target_label'] = df['target'].map(TARGET_DICT)
 
 
 # Export
-df.to_csv("../data/processed/data.csv", index=False)
+df.to_csv("/kaggle/working/teknofestupdated/data/processed/data.csv", index=False)

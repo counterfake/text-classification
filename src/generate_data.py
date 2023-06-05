@@ -3,7 +3,7 @@ from utils.constants import TARGET_DICT
 from utils.preprocess_utils import preprocess_text
 
 # Load data
-df = pd.read_csv("../data/raw/train_3class_balanced.csv", sep=",")
+df = pd.read_csv("/kaggle/input/train3-class/train_3class_balanced.csv", sep=",")
 df["text"] = preprocess_text(df["text"])
 
 # Length filtering

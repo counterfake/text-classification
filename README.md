@@ -1,8 +1,12 @@
 Repo'da yapılan değişiklikler:
-NUM_LABELS değişkeni bert_model.py'a eklendi.
-Preprocess kısmında regex kelimeler için işaretçi ekleyen fonksiyonlar yazıldı.
-TARGET_DICT task'a uygun değiştirildi.
-Eğitim Cross-Validation ile yapılmadığı için, preprocess kısmı düzeltildi, ve train/validation spliti ayarlandı.
+
+-NUM_LABELS değişkeni bert_model.py'a eklendi.
+
+-Preprocess kısmında regex kelimeler için işaretçi ekleyen fonksiyonlar yazıldı.
+
+-TARGET_DICT task'a uygun değiştirildi.
+
+-Eğitim Cross-Validation ile yapılmadığı için, preprocess kısmı düzeltildi, ve train/validation spliti ayarlandı.
 
 ![](img/l2header.png)
 

@@ -16,7 +16,6 @@ from transformers import (AdamW, AutoModelForMaskedLM,
                           TrainingArguments, get_cosine_schedule_with_warmup)
 
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:21"
-NUM_LABELS = 3
 
 def get_optimizer_grouped_parameters(model,
                                      learning_rate,
@@ -215,6 +214,7 @@ class BertModel(BaseModel):
                  mlm_probability=0.15,
                  out_folder=None,
                  experiment_name='',
+                 num_labels=3,
                  ):
         
         """
@@ -239,6 +239,7 @@ class BertModel(BaseModel):
         self.mlm_pretrain = mlm_pretrain
         self.mlm_probability = mlm_probability
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.num_labels = num_labels
 
     def load(self):
         """
@@ -247,7 +248,7 @@ class BertModel(BaseModel):
         
         self.model = AutoModelForSequenceClassification.from_pretrained(self.model_path,
                                                                         use_auth_token=self.auth_token,
-                                                                        num_labels=NUM_LABELS)
+                                                                        num_labels=self.num_labels)
         self.model.to(self.device)
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_path,
                                                        use_auth_token=self.auth_token,
@@ -263,6 +264,7 @@ class BertModel(BaseModel):
         :param path: Model output path
         :return: Save trained model
         """
+        print(self.model, type(self.model))
         self.model.save_pretrained(path)
         self.tokenizer.save_pretrained(path)
 
@@ -353,7 +355,7 @@ class BertModel(BaseModel):
 
         # Model initialization
         self.model = AutoModelForSequenceClassification.from_pretrained(model_path,
-                                                                        num_labels=NUM_LABELS,
+                                                                        num_labels=self.num_labels,
                                                                         ignore_mismatched_sizes=True)
         self.model.to(self.device)
         self.tokenizer = AutoTokenizer.from_pretrained(model_path,
@@ -376,7 +378,6 @@ class BertModel(BaseModel):
         # Dataset creation
         train_texts = x_train.to_list()
         train_labels = y_train.to_list()
-
         train_encodings = self.tokenizer(train_texts,
                                          truncation=True,
                                          padding=True,

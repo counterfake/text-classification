@@ -8,31 +8,6 @@ from .preprocess_utils import preprocess_text
 from .data_utils import read_model_zoo, update_zoo, write_model_zoo
 from .constants import MODEL_CV_RESULT_PATH, TARGET_DICT, TARGET_INV_DICT
 
-"""
-def add_external_positive_data(x_series, y_series):
-    
-    Adds external non-offensive corpus to the fiven original data
-
-    ---------
-    :param x_series: Original text data
-    :param y_series: Original labels
-    :return: Concatenated original and extra corpus with respective labels
-    
-    external_path = "../data/external/tweetset.csv"
-    if not os.path.exists(external_path):
-        os.system(
-            f"wget -O {external_path} https://github.com/ezgisubasi/turkish-tweets-sentiment-analysis/raw/main/data/tweetset.csv")
-    ext_df = pd.read_csv(external_path,
-                         encoding="windows-1254")
-    ext_df = ext_df[ext_df["Tip"] == "Pozitif"].reset_index(drop=True)
-    ext_df["target"] = 0
-    x_train_ext = ext_df["Paylaşım"].str.lower().rename("text")
-    y_train_ext = ext_df["target"]
-    x_series = pd.concat([x_series, x_train_ext], ignore_index=True)
-    y_series = pd.concat([y_series, y_train_ext], ignore_index=True)
-    return x_series, y_series
-"""
-
 
 def run_cv(model_obj,
            model_params: dict,
@@ -81,8 +56,8 @@ def run_cv(model_obj,
         X_val = input_df[input_df[fold_col] == fold_id][x_col]
         y_val = input_df[input_df[fold_col] == fold_id][y_col]
 
-        X_train = preprocess_text(X_train, prevent_bias=prevent_bias)
-        X_val = preprocess_text(X_val, prevent_bias=prevent_bias)
+        X_train = preprocess_text(X_train, language="english", prevent_bias=prevent_bias)
+        X_val = preprocess_text(X_val, language="english", prevent_bias=prevent_bias)
 
         val_idx = y_val.index.tolist()
 

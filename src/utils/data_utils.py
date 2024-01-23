@@ -3,7 +3,7 @@ import json
 
 import pandas as pd
 
-from .constants import PROCESSED_DATA_PATH, ZOO_PATH
+from .constants import ZOO_PATH
 
 
 def update_zoo(zoo_dict, new_member):
@@ -37,10 +37,10 @@ def write_model_zoo(zoo_dict):
     print("The result is logged to the model zoo!")
 
 
-def read_training_data():
+def read_training_data(processed_data_path):
     """
     Read processed competition train file
     """
-    df = pd.read_csv(PROCESSED_DATA_PATH)
-    df["pred"] = "OTHER"
+    df = pd.read_csv(processed_data_path)
+    df["pred"] = -1
     return df
